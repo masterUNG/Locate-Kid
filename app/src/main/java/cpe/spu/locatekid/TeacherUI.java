@@ -68,7 +68,10 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     TextView message;
     Button btnWrite;
 
-
+    //For Display
+    private TextView nameStudentTextView, surnameStudentTextView,
+            classTextView, addressTextView;
+    private ImageView studentImageView;
 
 
     @Override
@@ -82,6 +85,11 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         phoneTextView = (TextView) findViewById(R.id.textView10);
         avatarImageView = (ImageView) findViewById(R.id.imageView3);
         buttonexit = (Button) findViewById(R.id.button8);
+        nameStudentTextView = (TextView) findViewById(R.id.textView11);
+        surnameStudentTextView = (TextView) findViewById(R.id.textView12);
+        classTextView = (TextView) findViewById(R.id.textView13);
+        addressTextView = (TextView) findViewById(R.id.textView14);
+        studentImageView = (ImageView) findViewById(R.id.imageView4);
 
         //get ค่าจาก intent ที่แล้วมาใช้
         loginStrings = getIntent().getStringArrayExtra("Login"); //นำค่าจากหน้าที่แล้วมาจาก putextra
@@ -117,22 +125,21 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         message = (TextView) findViewById(R.id.edit_message);
         btnWrite = (Button) findViewById(R.id.button);
 
-        btnWrite.setOnClickListener(new View.OnClickListener()
-        {
+        btnWrite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    if(myTag ==null) {
+                    if (myTag == null) {
                         Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
                     } else {
                         write(message.getText().toString(), myTag);
-                        Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                        Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG).show();
                     }
                 } catch (IOException e) {
-                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } catch (FormatException e) {
-                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -149,17 +156,14 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
-        writeTagFilters = new IntentFilter[] { tagDetected };
-
-
-
+        writeTagFilters = new IntentFilter[]{tagDetected};
 
 
     }   // Main Method
 
 
     /******************************************************************************
-     **********************************Read From NFC Tag***************************
+     * *********************************Read From NFC Tag***************************
      ******************************************************************************/
     private void readFromIntent(Intent intent) {
         String action = intent.getAction();
@@ -177,6 +181,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
             buildTagViews(msgs);
         }
     }
+
     private void buildTagViews(NdefMessage[] msgs) {
         if (msgs == null || msgs.length == 0) return;
 
@@ -261,7 +266,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
                 studentStrings = new String[columnStudent.length];
 
-                for (int i=0;i<jsonArray.length();i++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
 
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -269,7 +274,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
                         Log.d("14octV2", "ID_ParntString OK");
                         aBoolean = false;
-                        for (int i1=0;i1<columnStudent.length;i1++) {
+                        for (int i1 = 0; i1 < columnStudent.length; i1++) {
 
                             studentStrings[i1] = jsonObject.getString(columnStudent[i1]);
                             Log.d("14octV2", "studentString(" + i1 + ") = " + studentStrings[i1]);
@@ -289,7 +294,17 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
                 } else {
                     Log.d("14octV1", "Tag " + ID_ParentString + " OK");
-                }
+
+                    nameStudentTextView.setText("ชื่อ : " + studentStrings[1]);
+                    surnameStudentTextView.setText("สกุล : " + studentStrings[2]);
+                    classTextView.setText("ชั่นเรียน : " + studentStrings[3]);
+                    addressTextView.setText("ที่อยู่ : " + studentStrings[4]);
+
+                    Picasso.with(context)
+                            .load(studentStrings[5])
+                            .into(studentImageView);
+
+                }   // if
 
 
             } catch (Exception e) {
@@ -302,10 +317,10 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
 
     /******************************************************************************
-     **********************************Write to NFC Tag****************************
+     * *********************************Write to NFC Tag****************************
      ******************************************************************************/
     private void write(String text, Tag tag) throws IOException, FormatException {
-        NdefRecord[] records = { createRecord(text) };
+        NdefRecord[] records = {createRecord(text)};
         NdefMessage message = new NdefMessage(records);
         // Get an instance of Ndef for the tag.
         Ndef ndef = Ndef.get(tag);
@@ -316,68 +331,65 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         // Close the connection
         ndef.close();
     }
+
     private NdefRecord createRecord(String text) throws UnsupportedEncodingException {
-        String lang       = "en";
-        byte[] textBytes  = text.getBytes();
-        byte[] langBytes  = lang.getBytes("US-ASCII");
-        int    langLength = langBytes.length;
-        int    textLength = textBytes.length;
-        byte[] payload    = new byte[1 + langLength + textLength];
+        String lang = "en";
+        byte[] textBytes = text.getBytes();
+        byte[] langBytes = lang.getBytes("US-ASCII");
+        int langLength = langBytes.length;
+        int textLength = textBytes.length;
+        byte[] payload = new byte[1 + langLength + textLength];
 
         // set status byte (see NDEF spec for actual bits)
         payload[0] = (byte) langLength;
 
         // copy langbytes and textbytes into payload
-        System.arraycopy(langBytes, 0, payload, 1,              langLength);
+        System.arraycopy(langBytes, 0, payload, 1, langLength);
         System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
 
-        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  new byte[0], payload);
+        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], payload);
 
         return recordNFC;
     }
-
 
 
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         readFromIntent(intent);
-        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             myTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         }
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         WriteModeOff();
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         WriteModeOn();
     }
 
 
-
     /******************************************************************************
-     **********************************Enable Write********************************
+     * *********************************Enable Write********************************
      ******************************************************************************/
-    private void WriteModeOn(){
+    private void WriteModeOn() {
         writeMode = true;
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, writeTagFilters, null);
     }
+
     /******************************************************************************
-     **********************************Disable Write*******************************
+     * *********************************Disable Write*******************************
      ******************************************************************************/
-    private void WriteModeOff(){
+    private void WriteModeOff() {
         writeMode = false;
         nfcAdapter.disableForegroundDispatch(this);
     }   // WriteModeOff
-
-
-
 
 
     private void loadImageAvatar(String id) {
@@ -388,11 +400,11 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
     }//Loadimage
 
-    private class LoadImage extends AsyncTask<Void, Void, String>
-    {
+    private class LoadImage extends AsyncTask<Void, Void, String> {
         private Context context;
         private String idString;
         private static final String urlPHPimage = "http://swiftcodingthai.com/golf1/get_image_teacher_where_id.php";
+
         public LoadImage(Context context, String idString) {
             this.context = context;
             this.idString = idString;
@@ -524,7 +536,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
             SimpleFTP simpleFTP = new SimpleFTP();
             simpleFTP.connect("ftp.swiftcodingthai.com",
-                  21, "golf1@swiftcodingthai.com", "Abc12345");
+                    21, "golf1@swiftcodingthai.com", "Abc12345");
             simpleFTP.bin(); //แปลงเป็น binary โยนไปดัง database
             simpleFTP.cwd("Image"); //กำหนด directory ที่เก็บรูปไว้
             simpleFTP.stor(new File(imagePathString));
