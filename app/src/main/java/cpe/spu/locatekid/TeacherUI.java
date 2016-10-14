@@ -180,7 +180,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     private void buildTagViews(NdefMessage[] msgs) {
         if (msgs == null || msgs.length == 0) return;
 
-        String text = "";
+        String strTagNFC = "";  // สิ่งที่อ่านได้จาก NFC
 //        String tagId = new String(msgs[0].getRecords()[0].getType());
         byte[] payload = msgs[0].getRecords()[0].getPayload();
         String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
@@ -189,13 +189,99 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
         try {
             // Get the Text
-            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+            strTagNFC = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
         } catch (UnsupportedEncodingException e) {
             Log.e("UnsupportedEncoding", e.toString());
         }
 
-        tvNFCContent.setText("NFC Content: " + text);
+        //Get tagNFC finish
+
+        showDetailStudent(strTagNFC);
+
+
+        tvNFCContent.setText("NFC Content: " + strTagNFC);
     }
+
+    private void showDetailStudent(String strTagNFC) {
+
+        SynStudent synStudent = new SynStudent(TeacherUI.this);
+        synStudent.execute(strTagNFC);
+
+    }   // showDetail
+
+    private class SynStudent extends AsyncTask<String, Void, String> {
+
+        //Explicit
+        private Context context;
+        private static final String urlJSON = "http://swiftcodingthai.com/golf1/get_student.php";
+        private String ID_ParentString;
+        private boolean aBoolean = true;
+
+        public SynStudent(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            ID_ParentString = strings[0];
+
+            try {
+
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(urlJSON).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+            } catch (Exception e) {
+                Log.d("14octV1", "e doInBack ==> " + e.toString());
+                return null;
+            }
+
+        }   // doInBack
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Log.d("14octV1", "JSON ==> " + s);
+            Log.d("14octV1", "ID_parent ==> " + ID_ParentString);
+
+            try {
+
+                JSONArray jsonArray = new JSONArray(s);
+                for (int i=0;i<jsonArray.length();i++) {
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    if (ID_ParentString.equals(jsonObject.getString("ID_Parent"))) {
+
+                        aBoolean = false;
+
+                    }   // if
+
+                }   // for
+
+                if (aBoolean) {
+                    //Search False
+                    Alert alert = new Alert();
+                    alert.myDialog(context,
+                            "หา Tag นี้ไม่พบ",
+                            "ไม่มี " + ID_ParentString + " ใน ฐานข้อมูลของเรา");
+
+                } else {
+                    Log.d("14octV1", "Tag " + ID_ParentString + " OK");
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }   // onPost
+
+    }   // SynStudent Class
 
 
     /******************************************************************************
