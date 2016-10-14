@@ -64,7 +64,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     Tag myTag;
     Context context;
 
-    TextView tvNFCContent;
+
     TextView message;
     Button btnWrite;
 
@@ -113,7 +113,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         //NFC
         context = this;
 
-        tvNFCContent = (TextView) findViewById(R.id.nfc_contents);
+
         message = (TextView) findViewById(R.id.edit_message);
         btnWrite = (Button) findViewById(R.id.button);
 
@@ -198,8 +198,6 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
         showDetailStudent(strTagNFC);
 
-
-        tvNFCContent.setText("NFC Content: " + strTagNFC);
     }
 
     private void showDetailStudent(String strTagNFC) {

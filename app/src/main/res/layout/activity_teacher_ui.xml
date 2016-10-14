@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,24 +11,85 @@
     tools:context="cpe.spu.locatekid.TeacherUI"
     android:background="@drawable/bg7">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="225dp"
         android:layout_marginBottom="45dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Write a message: ">
-        </TextView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/linWrite">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/no_image"
+                        android:id="@+id/imageView4"
+                        android:layout_weight="1" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:padding="15dp">
+
+                        <TextView
+                            android:text="TextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textView11"
+                            android:textSize="@dimen/headline2"
+                            android:textColor="@android:color/background_light" />
+
+                        <TextView
+                            android:text="TextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textView12"
+                            android:textSize="@dimen/headline2"
+                            android:textColor="@android:color/background_light" />
+
+                        <TextView
+                            android:text="TextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textView13"
+                            android:textSize="@dimen/headline2"
+                            android:textColor="@android:color/background_light" />
+
+                        <TextView
+                            android:text="TextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textView14"
+                            android:textSize="@dimen/headline2"
+                            android:textColor="@android:color/background_light" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20sp" >
+            android:layout_marginTop="20sp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/linWrite">
 
             <EditText
                 android:id="@+id/edit_message"
@@ -42,15 +104,9 @@
                 android:layout_weight="1"
                 android:text="Write" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/nfc_contents"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
 
 
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
