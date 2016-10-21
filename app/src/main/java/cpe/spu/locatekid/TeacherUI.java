@@ -43,6 +43,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 
 public class TeacherUI extends AppCompatActivity implements View.OnClickListener {
@@ -50,7 +53,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     //ประกาศตัวแปร
     private TextView nameTextView, surnameTextView, phoneTextView;
     private ImageView avatarImageView;
-    private String[] loginStrings;
+    private String[] loginStrings, myStudentStrings;
     private String imagePathString, imageNameString;
     private static final String urlPHP = "http://swiftcodingthai.com/golf1/edit_image_teacher.php";
     Button buttonexit;
@@ -78,6 +81,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     //For Check Student
     private RadioGroup radioGroup;
     private RadioButton inRadioButton, outRadioButton;
+    private String currentDateString;
 
 
     @Override
@@ -193,10 +197,10 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
     }   // Main Method
 
-    private void myAlertCheck(int i) {
+    private void myAlertCheck(final int index) {
 
         //0 ==> out, 1 ==> in Car
-        Log.d("21octV1", "i ==> " + i);
+        Log.d("21octV1", "i ==> " + index);
 
         String[] strings = new String[]{"นักเรียนลงรถ", "นักเรียนขึ้นรถ"};
 
@@ -204,7 +208,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         builder.setCancelable(false);
         builder.setIcon(R.drawable.rat48);
         builder.setTitle("เช็คนักเรียน");
-        builder.setMessage(strings[i]);
+        builder.setMessage(strings[index]);
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -214,7 +218,8 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                updateJobList(i);
+
+                updateJobList(index);
                 dialogInterface.dismiss();
             }
         });
@@ -225,7 +230,42 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
     private void updateJobList(int i) {
 
-    }
+        //i ? 1 ==> Create Record , 0 ==> Edit Record Where Date, id_Student, Status
+
+        switch (i) {
+
+            case 0: //0 ==> Edit Record Where Date, id_Student, Status
+                break;
+            case 1: //1 ==> Create Record
+                createTimeRecord();
+                break;
+
+        }   // switch
+
+    }   // updateJobList
+
+    private void createTimeRecord() {
+
+        String strURL = "http://swiftcodingthai.com/golf1/add_time_student_master.php";
+
+        //Get Date
+        Calendar calendar = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat dateFormat1 = new SimpleDateFormat("HH:mm");
+        currentDateString = dateFormat.format(calendar.getTime());
+        String strTimeIn = dateFormat1.format(calendar.getTime());
+        Log.d("21octV1", "currentDateString ==> " + currentDateString);
+        Log.d("21octV1", "strTimeIn ==> " + strTimeIn);
+
+        //Get ID_Studetn
+        String strIDstudent = myStudentStrings[0];
+        Log.d("21octV1", "strIDstudent ==> " + strIDstudent);
+
+
+
+
+
+    }   // createTimeRecord
 
 
     /******************************************************************************
@@ -331,6 +371,7 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
                 JSONArray jsonArray = new JSONArray(s);
 
                 studentStrings = new String[columnStudent.length];
+                myStudentStrings = new String[columnStudent.length];
 
                 for (int i = 0; i < jsonArray.length(); i++) {
 
@@ -344,6 +385,8 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
                             studentStrings[i1] = jsonObject.getString(columnStudent[i1]);
                             Log.d("14octV2", "studentString(" + i1 + ") = " + studentStrings[i1]);
+
+                            myStudentStrings[i1] = studentStrings[i1];
 
                         }   // for
 
