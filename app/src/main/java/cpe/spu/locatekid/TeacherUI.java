@@ -7,6 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
@@ -16,6 +20,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -83,6 +88,11 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     private RadioButton inRadioButton, outRadioButton;
     private String currentDateString;
 
+    //For Get Location
+    private LocationManager locationManager;
+    private Criteria criteria;
+    private double latADouble, lngADouble;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +113,13 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         radioGroup = (RadioGroup) findViewById(R.id.ragCheck);
         inRadioButton = (RadioButton) findViewById(R.id.radioButton3);
         outRadioButton = (RadioButton) findViewById(R.id.radioButton4);
+
+        //Setup Location
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
 
         //Check Student
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -194,8 +211,141 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
         writeTagFilters = new IntentFilter[]{tagDetected};
 
+        //Loop
+        myLoop();
+
 
     }   // Main Method
+
+    private class EditLocation extends AsyncTask<String, Void, String> {
+
+        //Explicit
+        private Context context;
+        private String idTeacherString, latString, lngString;
+
+        public EditLocation(Context context,
+                            String idTeacherString,
+                            String latString,
+                            String lngString) {
+            this.context = context;
+            this.idTeacherString = idTeacherString;
+            this.latString = latString;
+            this.lngString = lngString;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+
+                OkHttpClient okHttpClient = new OkHttpClient();
+                RequestBody requestBody = new FormEncodingBuilder()
+                        .add("isAdd", "true")
+                        .add("ID_Teacher", idTeacherString)
+                        .add("Lat", latString)
+                        .add("Lng", lngString)
+                        .build();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(strings[0]).post(requestBody).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+
+
+        }   // doInBack
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Log.d("21octV3", "Result ==> " + s);
+
+        }   // onPost
+
+    }   // EditLocation Class
+
+
+    private void myLoop() {
+
+        Log.d("21octV3", "lat ==> " + latADouble);
+        Log.d("21octV3", "lng ==> " + lngADouble);
+
+        String urlEdit = "http://swiftcodingthai.com/golf1/edit_teacher_master.php";
+
+        //To Do
+        EditLocation editLocation = new EditLocation(TeacherUI.this,
+                loginStrings[0],
+                Double.toString(latADouble),
+                Double.toString(lngADouble));
+        editLocation.execute(urlEdit);
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myLoop();
+            }
+        }, 3000);
+
+
+    }   // myLoop
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationManager.removeUpdates(locationListener);
+    }
+
+    public Location myFindLocation(String strProvider) {
+
+        Location location = null;
+
+        if (locationManager.isProviderEnabled(strProvider)) {
+
+            locationManager.requestLocationUpdates(strProvider, 1000, 10, locationListener);
+            location = locationManager.getLastKnownLocation(strProvider);
+
+        } else {
+            Log.d("21octV3", "Cannot Find Location");
+        }
+
+        return location;
+    }
+
+
+    public LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+
+            latADouble = location.getLatitude();
+            lngADouble = location.getLongitude();
+
+        }   // getLocation
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
+
+
 
     private void myAlertCheck(final int index) {
 
@@ -616,7 +766,26 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
     public void onResume() {
         super.onResume();
         WriteModeOn();
-    }
+
+        //For Get Location
+        locationManager.removeUpdates(locationListener);
+        latADouble = 0;
+        lngADouble = 0;
+
+        Location networkLocation = myFindLocation(LocationManager.NETWORK_PROVIDER);
+        if (networkLocation != null) {
+            latADouble = networkLocation.getLatitude();
+            lngADouble = networkLocation.getLongitude();
+        }
+
+        Location gpsLocation = myFindLocation(LocationManager.GPS_PROVIDER);
+        if (gpsLocation != null) {
+            latADouble = gpsLocation.getLatitude();
+            lngADouble = gpsLocation.getLongitude();
+        }
+
+
+    }   // onResume
 
 
     /******************************************************************************
