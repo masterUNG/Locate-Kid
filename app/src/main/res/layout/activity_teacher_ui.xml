@@ -50,15 +50,36 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="@dimen/icon_height"
-                    android:layout_height="@dimen/icon_height"
+                    android:layout_height="match_parent"
                     android:padding="10dp">
 
                     <ImageView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:srcCompat="@drawable/no_image"
                         android:id="@+id/imageView4"
                         android:layout_weight="1" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="10dp">
+
+                        <RadioButton
+                            android:text="In Car"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioButton3"
+                            android:layout_weight="1" />
+
+                        <RadioButton
+                            android:text="Out Car"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioButton4"
+                            android:layout_weight="1" />
+                    </RadioGroup>
                 </LinearLayout>
 
                 <LinearLayout
