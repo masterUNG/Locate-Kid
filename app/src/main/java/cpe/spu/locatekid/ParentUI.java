@@ -39,7 +39,7 @@ public class ParentUI extends AppCompatActivity implements View.OnClickListener 
     private String[] loginStrings;
     private String imagePathString, imageNameString;
     private static final String urlPHP = "http://swiftcodingthai.com/golf1/edit_image_parent.php";
-    Button buttonexit;
+    private Button buttonexit, mapButton;
 
 
     @Override
@@ -53,6 +53,17 @@ public class ParentUI extends AppCompatActivity implements View.OnClickListener 
         phoneTextview = (TextView) findViewById(R.id.textView6);
         avatarImageView = (ImageView) findViewById(R.id.imageView2);
         buttonexit = (Button) findViewById(R.id.button2);
+        mapButton = (Button) findViewById(R.id.button3);
+
+        //Map Controller
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ParentUI.this, MapsActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         //get ค่าจาก intent ที่แล้วมาใช้
         loginStrings = getIntent().getStringArrayExtra("Login"); //นำค่าจากหน้าที่แล้วมาจาก putextra

@@ -4,5 +4,6 @@
     <string name="parent">ผู้ปกครอง</string>
     <string name="teacher">คุณครูประจำรถ</string>
     <string name="mode">เข้าสู่ระบบโดย</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>
