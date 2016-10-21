@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +75,10 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
             classTextView, addressTextView;
     private ImageView studentImageView;
 
+    //For Check Student
+    private RadioGroup radioGroup;
+    private RadioButton inRadioButton, outRadioButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +96,32 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         classTextView = (TextView) findViewById(R.id.textView13);
         addressTextView = (TextView) findViewById(R.id.textView14);
         studentImageView = (ImageView) findViewById(R.id.imageView4);
+        radioGroup = (RadioGroup) findViewById(R.id.ragCheck);
+        inRadioButton = (RadioButton) findViewById(R.id.radioButton3);
+        outRadioButton = (RadioButton) findViewById(R.id.radioButton4);
+
+        //Check Student
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+
+                switch (i) {
+
+                    case R.id.radioButton3: // IN
+                        myAlertCheck(1);
+                        break;
+                    case R.id.radioButton4: // OUT
+                        myAlertCheck(0);
+                        break;
+
+                }   // switch
+
+
+
+            }   // onCheck
+        });
+
+
 
         //get ค่าจาก intent ที่แล้วมาใช้
         loginStrings = getIntent().getStringArrayExtra("Login"); //นำค่าจากหน้าที่แล้วมาจาก putextra
@@ -160,6 +192,12 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
 
     }   // Main Method
+
+    private void myAlertCheck(int i) {
+
+        Log.d("21octV1", "i ==> " + i);
+
+    }   // myAlertCheck
 
 
     /******************************************************************************
@@ -303,6 +341,8 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
                     Picasso.with(context)
                             .load(studentStrings[5])
                             .into(studentImageView);
+
+                    radioGroup.clearCheck();
 
                 }   // if
 
