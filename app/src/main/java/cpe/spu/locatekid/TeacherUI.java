@@ -195,9 +195,37 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
     private void myAlertCheck(int i) {
 
+        //0 ==> out, 1 ==> in Car
         Log.d("21octV1", "i ==> " + i);
 
+        String[] strings = new String[]{"นักเรียนลงรถ", "นักเรียนขึ้นรถ"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(TeacherUI.this);
+        builder.setCancelable(false);
+        builder.setIcon(R.drawable.rat48);
+        builder.setTitle("เช็คนักเรียน");
+        builder.setMessage(strings[i]);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                updateJobList(i);
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+
+
     }   // myAlertCheck
+
+    private void updateJobList(int i) {
+
+    }
 
 
     /******************************************************************************
