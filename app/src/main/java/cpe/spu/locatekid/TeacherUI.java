@@ -219,7 +219,10 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                updateJobList(index);
+
+                //index ? 1 ==> Create Record , 0 ==> Edit Record Where Date, id_Student, Status
+                createTimeRecord(index);
+
                 dialogInterface.dismiss();
             }
         });
@@ -228,34 +231,21 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
 
     }   // myAlertCheck
 
-    private void updateJobList(int i) {
 
-        //i ? 1 ==> Create Record , 0 ==> Edit Record Where Date, id_Student, Status
 
-        switch (i) {
-
-            case 0: //0 ==> Edit Record Where Date, id_Student, Status
-                break;
-            case 1: //1 ==> Create Record
-                createTimeRecord();
-                break;
-
-        }   // switch
-
-    }   // updateJobList
-
-    private void createTimeRecord() {
+    private void createTimeRecord(int i) {
 
         String strURL = "http://swiftcodingthai.com/golf1/add_time_student_master.php";
+        String strURLedit = "http://swiftcodingthai.com/golf1/edit_time_out_master.php";
 
         //Get Date
         Calendar calendar = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         DateFormat dateFormat1 = new SimpleDateFormat("HH:mm");
         currentDateString = dateFormat.format(calendar.getTime());
-        String strTimeIn = dateFormat1.format(calendar.getTime());
+        String strTime = dateFormat1.format(calendar.getTime());
         Log.d("21octV1", "currentDateString ==> " + currentDateString);
-        Log.d("21octV1", "strTimeIn ==> " + strTimeIn);
+        Log.d("21octV1", "strTimeIn ==> " + strTime);
 
         //Get ID_Studetn
         String strIDstudent = myStudentStrings[0];
@@ -265,9 +255,150 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         String strIDteacher = loginStrings[0];
         Log.d("21octV1", "strIDteacher ==> " + strIDteacher);
 
+        switch (i) {
+            case 0: // Edit Record
 
+                Log.d("21octV2", "Edit Process");
+                EditTimeStudent editTimeStudent = new EditTimeStudent(TeacherUI.this,
+                        currentDateString, strTime, strIDstudent);
+                editTimeStudent.execute(strURLedit);
+
+                break;
+            case 1: // Add New Record
+                AddTimeStudent addTimeStudent = new AddTimeStudent(TeacherUI.this,
+                        currentDateString, strTime, strIDstudent, strIDteacher);
+                addTimeStudent.execute(strURL);
+                break;
+        }
 
     }   // createTimeRecord
+
+    private class EditTimeStudent extends AsyncTask<String, Void, String> {
+
+        //Explicit
+        private Context context;
+        private String dateString, timeOutString, idStudentString;
+
+        public EditTimeStudent(Context context,
+                               String dateString,
+                               String timeOutString,
+                               String idStudentString) {
+            this.context = context;
+            this.dateString = dateString;
+            this.timeOutString = timeOutString;
+            this.idStudentString = idStudentString;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+
+                OkHttpClient okHttpClient = new OkHttpClient();
+                RequestBody requestBody = new FormEncodingBuilder()
+                        .add("isAdd", "true")
+                        .add("CurrentDate", dateString)
+                        .add("Time_out", timeOutString)
+                        .add("ID_Student", idStudentString)
+                        .build();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(strings[0]).post(requestBody).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+
+        }   // doIn
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Log.d("21octV2", "Result ==> " + s);
+            String Result = null;
+            if (Boolean.parseBoolean(s)) {
+                Result = "Save Time Out Success";
+            } else {
+                Result = "Cannot Save Time Out";
+            }
+            Toast.makeText(context, Result, Toast.LENGTH_SHORT).show();
+
+
+        }   // onPost
+
+    }   // EditTime Class
+
+
+
+    private class AddTimeStudent extends AsyncTask<String, Void, String> {
+
+        //Explicit
+        private Context context;
+        private String dateString, timeInString, idStudentString, idTeacherString;
+
+        public AddTimeStudent(Context context,
+                              String dateString,
+                              String timeInString,
+                              String idStudentString,
+                              String idTeacherString) {
+            this.context = context;
+            this.dateString = dateString;
+            this.timeInString = timeInString;
+            this.idStudentString = idStudentString;
+            this.idTeacherString = idTeacherString;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+
+                OkHttpClient okHttpClient = new OkHttpClient();
+                RequestBody requestBody = new FormEncodingBuilder()
+                        .add("isAdd", "true")
+                        .add("Date", dateString)
+                        .add("Time_in", timeInString)
+                        .add("ID_Student", idStudentString)
+                        .add("ID_Teacher", idTeacherString)
+                        .build();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(strings[0]).post(requestBody).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        }   // doInBack
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Log.d("21octV1", "Result ==> " + s);
+            String result = null;
+
+            if (Boolean.parseBoolean(s)) {
+                result = "Save on Server Success";
+            } else {
+                result = "Cannot Update to Server";
+            }
+
+            Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+
+        }   // onPost
+
+    }   // AddTimeStudent Class
+
+
 
 
     /******************************************************************************
