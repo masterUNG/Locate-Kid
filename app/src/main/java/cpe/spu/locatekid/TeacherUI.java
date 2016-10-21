@@ -261,7 +261,9 @@ public class TeacherUI extends AppCompatActivity implements View.OnClickListener
         String strIDstudent = myStudentStrings[0];
         Log.d("21octV1", "strIDstudent ==> " + strIDstudent);
 
-
+        //Get ID_Teacher
+        String strIDteacher = loginStrings[0];
+        Log.d("21octV1", "strIDteacher ==> " + strIDteacher);
 
 
 
